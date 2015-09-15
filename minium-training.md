@@ -136,7 +136,7 @@ Let's try to select the `Tags` table header cell.
 browser.get("http://minium.vilt.io/sample-app/");
 ```
 
-- Position your cursor where you want to insert the
+- Position your cursor where you want to insert the generated code
 - Start Selector Gadget
 - On the web driver browser, click on `Tags` table header cell:
 
@@ -213,6 +213,8 @@ Now it's easy to click the checkbox of that row:
 var itemCheckbox = $(":checkbox").leftOf(recipientsCell);
 itemCheckbox.click(); // this will toggle the checkbox
 ```
+
+## JQuery methods
 
 ## Base Expression pattern
 
