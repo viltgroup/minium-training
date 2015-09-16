@@ -221,21 +221,22 @@ itemCheckbox.click(); // this will toggle the checkbox
 The concept behing the Base Elements expression is that it should represent the
 root elements of the UI that can be interacted with.
 
-For instance, when Modal elements are displayed (for instance, a Bootstrap
-Modal) we want `base` to evaluate to that Modal element, therefore excluding
-all elements that are behind the backdrop element.
+For instance, when Modal elements are displayed (for instance, a bootstrap
+modal dialog) we want `base` to evaluate to that modal element, therefore
+excluding all elements that are behind the backdrop element.
 
 Then, by using base as the root of our elements expressions, we can get some
 assurance that we are getting the right elements instead of getting elements
 that are not interactable (or should not be interactable) at that point.
 
 To demonstrate how useful this pattern can be, let's do a simple exercise:
-we'll start composing an email and then we'll try to click the first button
+we'll start composing an email and then we'll try to click the first button it
+finds:
 
 ```javascript
 browser.get("http://minium.vilt.io/sample-app/");
 
-// this will open the New message modal window
+// this will open the New message modal dialog
 $("#compose").click();
 
 // let's try to click the first available button
@@ -243,12 +244,12 @@ $("button").click();
 ```
 
 If we try to evaluate that code, it will fail. That's because
-`$("button").click()` will try to click the first matching button, and that one
-is under the modal backdrop and for that reason, it is not accessible for
-interactions.
+`$("button").click()` will try to click the first matching button (which is the
+`Compose` button), and that one is under the modal backdrop and for that reason,
+it is not accessible for interactions.
 
 You can try to evaluate `$("button")` and you'll see that lots of buttons in
-the page will highlight, both the ones that are in the modal window and the ones
+the page will highlight, both the ones that are in the modal dialog and the ones
 in the main page, that are not accessible due to the modal backdrop:
 
 ![Buttons](images/buttons.png)
@@ -262,29 +263,29 @@ base = $(":root").unless(".modal-backdrop").add(".modal-dialog");
 Let's
 
 - the first part, `$(":root").unless(".modal-backdrop")`, evaluates the page
-  root element when no modal backdrop exist (that is, when no modal window is
+  root element when no modal backdrop exist (that is, when no modal dialog is
   open)
-- the second part, `.add(".modal-dialog")`, adds modal window elements. Note
-  that, when a modal window is available, this second part evaluates into that
+- the second part, `.add(".modal-dialog")`, adds modal dialog elements. Note
+  that, when a modal dialog is available, this second part evaluates into that
   element, but the first part will evaluate into an empty set because of the
   existence of the modal backdrop
 
 So, basically that expression evaluates into the root element or into an opened
-modal window, but never both at the same time. If we try to evaluate `base`
-when a modal window is opened:
+modal dialog, but never both at the same time. If we try to evaluate `base`
+when a modal dialog is opened:
 
 ![Base expression evaluation when modal dialog is being displayed](images/base-modaldialog.png)
 
 So, if we use `base` as our "root" for finding elements in the page, we can now
 restrict them to accessible ones.
 
-Try to evaluate the following expression with the modal window open now:
+Try to evaluate the following expression with the modal dialog open now:
 
 ```javascript
 base.find("button")
 ```
 
-You'll see that only buttons inside the modal window were highlighted:
+You'll see that only buttons inside the modal dialog were highlighted:
 
 ![Buttons with base expression](images/buttons-base.png)
 
@@ -295,20 +296,93 @@ browser.get("http://minium.vilt.io/sample-app/");
 
 var base = $(":root").unless(".modal-backdrop").add(".modal-dialog");
 
-// this will open the New message modal window
+// this will open the New message modal dialog
 base.find("#compose").click();
 
 // let's try to click the first available button
 base.find("button").click();
 ```
 
-## Interaction Listeners
+## Waiting interactions and presets
+
+Sometimes, it is necessary to wait that some element is displayed on the page
+or not. For instance, a spinning wheel is often displayed to indicate that the
+application is doing something in background, and therefore you should wait
+until it disappears.
+
+In Minium Mail sample app, it shows a spinning wheel after you perform some
+operation.
+
+Let's try to delete an email item and then compose another one:
 
 ```javascript
-loadingUnexistenceListener = minium.interactionListeners
+browser.get("http://minium.vilt.io/sample-app/");
+
+var mailItemCheckbox = $(":checkbox");
+var removeBtn = $("#remove-action");
+var composeBtn = $("#compose");
+
+mailItemCheckbox.click();
+removeBtn.click();
+composeBtn.click();
+```
+
+If you run that script all at once (select it all and press `Ctrl + Enter`),
+you'll notice it will fail when trying to click the `Compose` button. The
+reason is that the spinning wheel is being displayed and it "blocks" elements
+behing the backdrop form being interacted with. So, we need to wait for that
+spinning wheel to disappear before we can click the `Compose` button. We can do
+that with the `.waitForUnexistence()` method:
+
+```javascript
+browser.get("http://minium.vilt.io/sample-app/");
+
+var loading = $(".loading").withCss("display", "block");
+var mailItemCheckbox = $(":checkbox");
+var removeBtn = $("#remove-action");
+var composeBtn = $("#compose");
+
+mailItemCheckbox.click();
+removeBtn.click();
+loading.waitForUnexistence();
+composeBtn.click();
+```
+
+The interaction `loading.waitForUnexistence()` will wait at most for a specified
+amount of time (by default, 5 seconds) that the element doesn't exist. After
+that time, it will fail, otherwise, as soon the element disappears, it will
+proceed.
+
+However, it is possible that
+
+```javascript
+// browser configuration
+browser.configure()
+  .waitingPreset("fast")
+    .timeout(1, timeUnits.SECONDS)
+  .done()
+  .waitingPreset("slow")
+    .timeout(10, timeUnits.SECONDS)
+  .done();
+
+var loading = $(".loading").withCss("display", "block");
+
+loading.waitForUnexistence("slow");
+```
+
+## Interaction Listeners
+
+### ensureExistence / ensureUnexistence
+
+```javascript
+var timeUnits = require("minium/timeunits");
+
+var loading = $(".loading").withCss("display", "block");
+
+var loadingUnexistenceListener = minium.interactionListeners
   .ensureUnexistence(loading);
 
-timeoutListener = minium.interactionListeners
+var timeoutListener = minium.interactionListeners
   .onTimeout()
   .when(loading)
   .waitForUnexistence(loading)
