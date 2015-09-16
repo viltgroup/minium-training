@@ -1,5 +1,7 @@
 ## Javascript Editor
 
+Minium Developer allows you to program Minium scripts in Rhino javascript.
+
 ### Scope
 
 When we evaluate some javascript in Minium Developer, all variables declared
@@ -150,7 +152,7 @@ also matches those yellow cells
 ![Table headers with rejection](images/table-headers-exclusion.png)
 
 - You'll notice that cell became red, and cells that were yellow are no longer
-selected. That's because, by rejecting the `Subject` cell, SelectorGagdet tryed
+selected. That's because, by rejecting the `Subject` cell, Selector Gagdet tried
 to get a CSS selector that kept matching the green elements but excluded red
 elements, and that new CSS selector no longer matches the other yellow cells.
 - Now that only one cell is matching, and it is the one we want, we can accept
@@ -166,7 +168,15 @@ $("th:nth-child(2)")
 ```
 
 - You can now evaluate it, by ensuring your cursor is at that line, and by
-pressing `Ctrl + Enter`
+pressing `Ctrl + Enter`. This will highlight all matching elements (in this
+case, the `Tags` header cell).
+
+**Note:** Alternative ways to get the same cell using filters: use the selector
+gadget to select all header cells (you just need to click one, the others will
+became yellow), and then select it using either:
+
+- `$("th").eq(1)` (by index)
+- `$("th").withText("Tags")` (by its text)
 
 **Exercise**:
 
@@ -175,6 +185,12 @@ an email. You can use interaction methods, like `.click()`, `.fill(text)`,
 `.select(option)` (for select fields), and even use filter methods, like
 `.withText(text)` (it will only return matching elements that have that exact
 text).
+
+For instance, to click the `Compose` button:
+
+```javascript
+$("#compose").click();
+```
 
 ## Select cells in tables
 
@@ -260,7 +276,7 @@ So, let's consider the following base expression:
 base = $(":root").unless(".modal-backdrop").add(".modal-dialog");
 ```
 
-Let's
+Let's try to explain what it does:
 
 - the first part, `$(":root").unless(".modal-backdrop")`, evaluates the page
   root element when no modal backdrop exist (that is, when no modal dialog is
@@ -330,7 +346,7 @@ composeBtn.click();
 If you run that script all at once (select it all and press `Ctrl + Enter`),
 you'll notice it will fail when trying to click the `Compose` button. The
 reason is that the spinning wheel is being displayed and it "blocks" elements
-behing the backdrop form being interacted with. So, we need to wait for that
+behind the backdrop form being interacted with. So, we need to wait for that
 spinning wheel to disappear before we can click the `Compose` button. We can do
 that with the `.waitForUnexistence()` method:
 
@@ -353,9 +369,55 @@ amount of time (by default, 5 seconds) that the element doesn't exist. After
 that time, it will fail, otherwise, as soon the element disappears, it will
 proceed.
 
-However, it is possible that
+However, it is possible that the spinning wheel takes more than 5 seconds to
+disappear. Remember that, in real world applications, the spinning wheel is
+normally associated with time-consuming operations that involve AJAX requests.
+
+In those situations where we know that it will probably take more time, we need
+to ensure it will wait using a different timeout.
+
+Minium Mail lets us configure the loading time and that way we can simulate a
+time-consuming operation. The following code will change the loading time to be
+8 seconds:
 
 ```javascript
+browser.get("http://minium.vilt.io/sample-app/");
+
+var configBtn = $("#configure");
+var loadingTimeFld = $("#loading-time-seconds");
+var saveBtn = $("#config-save");
+
+configBtn.click();
+loadingTimeFld.fill("8");
+saveBtn.click();
+```
+
+Note that the loading time gets reset every time we refresh the page, so we
+won't reload the page using the `browser.get(...)` method. If you do, you need
+to change the loading time again.
+
+If we now try to run the same interaction code as we were running before:
+
+```javascript
+mailItemCheckbox.click();
+removeBtn.click();
+loading.waitForUnexistence();
+composeBtn.click();
+```
+
+it will fail with a `TimeoutException`. That's because
+`loading.waitForUnexistence()` timeout is 5 seconds and now the spinning wheel
+is displayed for 8 seconds.
+
+To fix it, we need to use waiting presets, which are basically labelled timeouts
+and polling intervals.
+
+The following code creates two waiting presets, `fast` and `slow`:
+
+```javascript
+// we need to load a module, we'll talk about this later
+var timeUnits = require("minium/timeunits");
+
 // browser configuration
 browser.configure()
   .waitingPreset("fast")
@@ -363,14 +425,30 @@ browser.configure()
   .done()
   .waitingPreset("slow")
     .timeout(10, timeUnits.SECONDS)
+    .interval(1, timeUnits.SECONDS)
   .done();
+```
 
-var loading = $(".loading").withCss("display", "block");
+If we now use `slow` waiting preset when calling `.waitForUnexistence()`, it
+will now wait at most 10 seconds instead of 5 seconds, and that way it will
+work:
 
+```javascript
+mailItemCheckbox.click();
+removeBtn.click();
 loading.waitForUnexistence("slow");
+composeBtn.click();
+```
+
+**Note:** There is a special waiting preset, `immediate`, that doesn't wait at
+all:
+
+```javascript
+loading.waitForUnexistence("immediate");
 ```
 
 ## Interaction Listeners
+
 
 ### ensureExistence / ensureUnexistence
 
