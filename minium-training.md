@@ -1,3 +1,43 @@
+## Install Minium
+
+
+#### 1. Download Minium Developer
+
+* Download Minium Tools for your platform from [github](https://github.com/viltgroup/minium-tools/releases).
+* Uncompress it in some folder (e.g. c:\Tools\minium-tools)
+
+#### 2. Run Minium Developer
+
+To launch Minium Developer, just run one of the following executables located in the folder where you uncompress it:
+
+* minium-developer.bat (also in windows, but this way you can see the stdout)
+* minium-developer (linux or mac)
+
+
+### Optional (but recommended): 
+Add the following paths to your PATH environment variable:
+
+* ${minium_home}/bin (for instance, c:\tools\minium-tools\bin)
+* ${minium_home}/drivers (for instance, c:\tools\minium-tools\drivers)
+
+
+## Open minium developer
+
+After that, Minium Developer should open [http://localhost:8089/#/editor](http://localhost:8089/#/editor) in your default browser.
+
+Once Minium Developer is open, you can see an editor where you can evaluate minium and javascript expression.
+
+* Write in the editor 'var x = 10'
+* Click on the button Evaluate or use the command CTRL + ENTER
+* You will see a modal to launch a webdriver
+
+A webdriver works like a browser and its where you will execute your tests or run your code.
+
+* Select a webdriver 
+* Click on Create
+* Check that a webdriver was launched
+
+
 ## Javascript Editor
 
 Minium Developer allows you to program Minium scripts in Rhino javascript.
