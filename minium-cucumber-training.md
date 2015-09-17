@@ -256,6 +256,9 @@ cd minium-mail-e2e-tests
 git checkout v2
 ```
 
+
+
+
 ### Modules
 
 With Minium you can also create modules, in order to help you keeping your code
@@ -319,11 +322,6 @@ When(/^I fill:$/, function(datatable) {
 
 ```
 
-### Background
-
-### Scenario Outlines
-
-
 You can check the version using modules doing:
 
 ```bash
@@ -331,6 +329,93 @@ git clone https://github.com/viltgroup/minium-mail-e2e-tests.git
 cd minium-mail-e2e-tests
 git checkout v3
 ```
+
+
+### Background
+
+Sometimes you will find yourself repeating the same `Given` steps in all of the scenarios in a feature. 
+
+You can move and group those steps under a Background section before the fisrt scenario. The background runs before each one of your scenarios.
+
+```gherkin
+Feature: Delete Emails
+
+  Background: 
+    Given I'm at Minium Mail
+
+  Scenario: Delete an email
+    Given an email with Subject "Minium Can!" exists
+    When I delete an email with Subject "Minium Can!"
+    And I navigate to section "Trash"
+    Then I should see an email with:
+      | Subject | Minium Can! |
+
+  Scenario: Delete an email from trash
+    Given I'm at section "Trash"
+    And an email with Subject "Phasellus vitae interdum nulla." exists
+    When I delete an email with Subject "Phasellus vitae interdum nulla."
+    Then I shouldn't see an email with:
+      | Subject | Minium Can! |
+```
+
+
+
+### Scenario Outlines
+
+
+In the follwoing scenarios, the steps are the same, only the data changes.
+
+```gherkin
+Scenario: Send an Email
+    When I click on button "Compose"
+    And I fill:
+      | Recipients | Rui Figueira   |
+      | Subject    | Minium Test    |
+      | Message    | My new Message |
+    And I click on button "Send"
+    And I navigate to section "Sent"
+    Then I should see an email with:
+      | Recipients | Rui Figueira   |
+      | Subject    | Minium Test    |
+      | Message    | My new Message |
+
+Scenario: Send an Email
+    When I click on button "Compose"
+    And I fill:
+      | Recipients | Mario Lameiras                                         |
+      | Subject    | BDD + Minium                                           |
+      | Message    | Egestas morbi at. Curabitur aliquet et commodo nonummy |
+    And I click on button "Send"
+    And I navigate to section "Sent"
+    Then I should see an email with:
+      | Recipients | Mario Lameiras                                  |
+      | Subject    | BDD + Minium                                    |
+      | Message    | Egestas morbi at. Curabitur aliquet et commodo  |
+```
+We can refactor this scenarios using Scenario outlines. Scenario outlines allow us to write more concisely Scenarios through the use of a template with placeholders, using `Examples` with tables and `< >` delimited parameters. The following `Scenario` is the same as the one above.
+
+```gherkin
+Scenario Outline: Send simple emails
+  When I click on button "Compose"
+  And I fill:
+    | Recipients | <to>      |
+    | Subject    | <subject> |
+    | Message    | <message> |
+  And I click on button "Send"
+  And I navigate to section "Sent"
+  Then I should see an email with:
+    | Recipients | <to>      |
+    | Subject    | <subject> |
+    | Message    | <message> |
+
+  Examples: 
+    | to             | subject      | message                                        |
+    | Rui Figueira   | Minium Test  | My New messages                                |
+    | Mario Lameiras | BDD + Minium | Egestas morbi at. Curabitur aliquet et commodo |
+```
+
+
+
 
 ---
 
