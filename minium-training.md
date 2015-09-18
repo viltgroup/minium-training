@@ -1,18 +1,18 @@
-## Install Minium
+# Minium Training
+
+In this training, we'll take a look into Minium using its API, and we'll use
+Minium Developer to write some Minium javascript code. We'll learn its concepts,
+namely `WebElements` and `Interactions`, as well as interaction listeners.
+We'll also make use of some tools provided by Minium Developer to helps us write
+Minium code and evaluate it.
+
+## Installation
 
 ### Download Minium Tools
 
 - Download Minium Tools for your platform from
   [github](https://github.com/viltgroup/minium-tools/releases).
 - Uncompress it in some folder (e.g. `c:\tools\minium-tools`)
-
-### Run Minium Developer
-
-To launch Minium Developer, just run one of the following executables
-located in the folder where you uncompress it:
-
-- `minium-developer.bat` (windows)
-- `minium-developer` (linux or mac)
 
 ### Optional (but recommended):
 Add the following paths to your PATH environment variable:
@@ -21,11 +21,19 @@ Add the following paths to your PATH environment variable:
 - `${minium_home}/drivers` (for instance,
   `c:\tools\minium-tools\drivers`)
 
-## Open minium developer
+## Run Minium Developer
+
+To launch Minium Developer, just run one of the following executables
+located in the folder where you uncompress it:
+
+- `bin/minium-developer` (linux or mac)
+- `bin/minium-developer.bat` (windows)
 
 After that, Minium Developer should open
 [http://localhost:8089/#/editor](http://localhost:8089/#/editor) in your
 default browser.
+
+## Javascript Console
 
 Once Minium Developer is open, you can see an javascript console where you can
 evaluate minium and javascript code:
@@ -50,11 +58,9 @@ browser.get("http://minium.vilt.io/sample-app");
 - Check that a WebDriver was launched, and that Minium Mail sample app was
   opened
 
-## Javascript Editor
-
 Minium Developer allows you to program Minium scripts in Rhino javascript.
 
-### Scope
+## Variables scope
 
 When we evaluate some javascript in Minium Developer, all variables declared
 we'll be maintained in the evaluation global scope. That means that, the next
@@ -83,8 +89,9 @@ After that, if you try to run the previous code, it will fail:
 ```javascript
 "Hello " + name // ReferenceError: "name" is not defined
 ```
+## Minium Concepts
 
-# WebElements
+### WebElements
 
 `WebElements` and its parent class `Elements` are the most important concept in
 Minium. They represent an instruction (from now on, we'll call them Minium
@@ -119,7 +126,7 @@ sentNavItem.text();
 sentNavItem.click();
 ```
 
-# Interactions
+### Interactions
 
 Interactions are another key concept in Minium. They represent user interactions
 with the browser, like clicking, filling input fields, or even waiting that some
@@ -167,9 +174,6 @@ may occur:
 - the expression keeps evaluating to an empty set, and the total period
   surpasses a specified `timeout` period. At this point, interaction is aborted
   and a `TimeoutException` is thrown.
-
-
-# Developing Minium with Minium Developer
 
 ## Selector Gadget
 
@@ -315,6 +319,30 @@ $("th").parents("tr");
 
 // retuns all unchecked checkboxes
 $(":checkbox").not(":checked");
+```
+**Note:** Try to avoid getting values from elements. Minium provides some jquery
+methods for accessing values from WebElements, like '.text()', '.attr(name)',
+etc. However, these methods will always evaluate immediatelly, which can be a
+problem, because Minium cannot ensure their evaluation occurs when it actually
+evaluates into a non-empty set. For that reason, it should be avoided.
+
+Instead, filters are provided to restrict elements based on a specific value:
+
+```javascript
+// gets element by text
+$("th").withText("Tags");
+
+// gets element by style value
+$("button").withCss("visibility", "visible");
+```
+
+In case you really need to get some value, consider chaining the method call
+with a .waitForExistence():
+
+```javascript
+var elemText = $("#compose").waitForExistence().text();
+// or getting a style value
+var backgroundColor = $("body").waitForExistence().css("background-color");
 ```
 
 ## Base Expression pattern
@@ -644,7 +672,7 @@ browser.configure()
     .add(timeoutListener);
 ```
 
-# Assertions
+## Assertions
 
 Minium includes [Expect library](https://github.com/Automattic/expect.js) for
 assertions, and extends it to add Minium-specific methods.
@@ -666,77 +694,3 @@ expect(compose).to.have.text("Compose");
 ```
 
 You can find more documentation on [Assertions API](http://minium.vilt.io/docs/core/api/assertions/).
-
-# Files and Modules
-
-
-## Configuration values
-
-In `config/application.yml` under your project, you can find all your Minium
-configuration (for instance, which default browser to use, browser window
-dimensions, etc.).
-
-There is, however, a special configuration block under `minium.config`: that
-is configuration you can add and use in your application. In your javascript
-code, you can access all its properties under the variable `config`.
-
-**Exercise:**
-
-Edit the `application.yml` and change it to have a property `name` with value
-`World`:
-
-```yaml
-minium:
-  webdriver:
-   ...
-  config:
-    name: World
-```
-
-That `name` property is now under the variable `config`, so you can evaluate the
-following code:
-
-```javascript
-"Hello " + config.name // it evaluate into "Hello World"
-```
-
-If you change the name to `Minium`, for instance:
-
-```yaml
-minium:
-  webdriver:
-   ...
-  config:
-    name: Minium
-```
-
-then re-evaluating `"Hello " + config.name` will return `Hello
-Minium`.
-
-You can even add complex configuration there:
-
-```yaml
-minium:
-  webdriver:
-   ...
-  config:
-    users:
-      administrator:
-        username: admin
-        password: strong_password
-    fruits:
-      - banana
-      - orange
-      - strawberry
-```
-
-and then access it:
-
-```javascript
-console.log(config.users['administrator'].username); // prints "admin"
-
-config.fruits.forEach(function (fruit) { console.log(fruit) }) // prints:
-// banana
-// orange
-// strawberry
-```
