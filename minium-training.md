@@ -1,42 +1,54 @@
 ## Install Minium
 
+### Download Minium Tools
 
-#### 1. Download Minium Developer
+- Download Minium Tools for your platform from
+  [github](https://github.com/viltgroup/minium-tools/releases).
+- Uncompress it in some folder (e.g. `c:\tools\minium-tools`)
 
-* Download Minium Tools for your platform from [github](https://github.com/viltgroup/minium-tools/releases).
-* Uncompress it in some folder (e.g. c:\Tools\minium-tools)
+### Run Minium Developer
 
-#### 2. Run Minium Developer
+To launch Minium Developer, just run one of the following executables
+located in the folder where you uncompress it:
 
-To launch Minium Developer, just run one of the following executables located in the folder where you uncompress it:
+- `minium-developer.bat` (windows)
+- `minium-developer` (linux or mac)
 
-* minium-developer.bat (also in windows, but this way you can see the stdout)
-* minium-developer (linux or mac)
-
-
-### Optional (but recommended): 
+### Optional (but recommended):
 Add the following paths to your PATH environment variable:
 
-* ${minium_home}/bin (for instance, c:\tools\minium-tools\bin)
-* ${minium_home}/drivers (for instance, c:\tools\minium-tools\drivers)
-
+- `${minium_home}/bin` (for instance, `c:\tools\minium-tools\bin`)
+- `${minium_home}/drivers` (for instance,
+  `c:\tools\minium-tools\drivers`)
 
 ## Open minium developer
 
-After that, Minium Developer should open [http://localhost:8089/#/editor](http://localhost:8089/#/editor) in your default browser.
+After that, Minium Developer should open
+[http://localhost:8089/#/editor](http://localhost:8089/#/editor) in your
+default browser.
 
-Once Minium Developer is open, you can see an editor where you can evaluate minium and javascript expression.
+Once Minium Developer is open, you can see an javascript console where you can
+evaluate minium and javascript code:
 
-* Write in the editor 'var x = 10'
-* Click on the button Evaluate or use the command CTRL + ENTER
-* You will see a modal to launch a webdriver
+![Javascript console](images/js-console.png)
 
-A webdriver works like a browser and its where you will execute your tests or run your code.
+- In the javascript console, write the following code:
 
-* Select a webdriver 
-* Click on Create
-* Check that a webdriver was launched
+```javascript
+// opens Minium Mail sample app
+browser.get("http://minium.vilt.io/sample-app");
+```
 
+- Click on the button `Evaluate` or use the command `Ctrl + Enter`
+- You will see a modal to launch a WebDriver browser where you can run your
+  tests against to:
+
+![WebDrivers dialog](images/webdrivers-dialog.png)
+
+- Select a WebDriver (e.g. Chrome)
+- Click on `Create`
+- Check that a WebDriver was launched, and that Minium Mail sample app was
+  opened
 
 ## Javascript Editor
 
@@ -72,75 +84,7 @@ After that, if you try to run the previous code, it will fail:
 "Hello " + name // ReferenceError: "name" is not defined
 ```
 
-## Configuration values
-
-In `config/application.yml`, you can find all your Minium configuration (for
-instance, which default browser to use, browser window dimensions, etc.).
-
-There is, however, a special configuration block under `minium.config`: that
-is configuration you can add and use in your application. In your javascript
-code, you can access all its properties under the variable `config`.
-
-**Exercise:**
-
-Edit the `application.yml` and change it to have a property `name` with value
-`World`:
-
-```yaml
-minium:
-  webdriver:
-   ...
-  config:
-    name: World
-```
-
-That `name` property is now under the variable `config`, so you can evaluate the
-following code:
-
-```javascript
-"Hello " + config.name // it evaluate into "Hello World"
-```
-
-If you change the name to `Minium`, for instance:
-
-```yaml
-minium:
-  webdriver:
-   ...
-  config:
-    name: Minium
-```
-
-then re-evaluating `"Hello " + config.name` will return `Hello
-Minium`.
-
-You can even add complex configuration there:
-
-```yaml
-minium:
-  webdriver:
-   ...
-  config:
-    users:
-      administrator:
-        username: admin
-        password: strong_password
-    fruits:
-      - banana
-      - orange
-      - strawberry
-```
-
-and then access it:
-
-```javascript
-console.log(config.users['administrator'].username); // prints "admin"
-
-config.fruits.forEach(function (fruit) { console.log(fruit) }) // prints:
-// banana
-// orange
-// strawberry
-```
+# WebElements and Interactions
 
 # Developing Minium with Minium Developer
 
@@ -185,31 +129,32 @@ browser.get("http://minium.vilt.io/sample-app/");
 ![Table headers](images/table-headers.png)
 
 - You'll notice that the cell you clicked became green, and other table
-headers cells became yellow. That means that the CSS selector it generated
-also matches those yellow cells
+  headers cells became yellow. That means that the CSS selector it generated
+  also matches those yellow cells
 - Now click any of those yellow cells to reject it (for instance, `Subject`)
 
 ![Table headers with rejection](images/table-headers-exclusion.png)
 
 - You'll notice that cell became red, and cells that were yellow are no longer
-selected. That's because, by rejecting the `Subject` cell, Selector Gagdet tried
-to get a CSS selector that kept matching the green elements but excluded red
-elements, and that new CSS selector no longer matches the other yellow cells.
+  selected. That's because, by rejecting the `Subject` cell, Selector Gagdet
+  tried to get a CSS selector that kept matching the green elements but excluded
+  red elements, and that new CSS selector no longer matches the other yellow
+  cells.
 - Now that only one cell is matching, and it is the one we want, we can accept
-that CSS selector by accepting it in Minium Developer:
+  that CSS selector by accepting it in Minium Developer:
 
 ![Selector gadget](images/selector-gadget-accept.png)
 
 - You'll now notice that Minium Developer inserted the following Minium
-expression in your editor, at the place where your cursor was:
+  expression in your editor, at the place where your cursor was:
 
 ```javascript
 $("th:nth-child(2)")
 ```
 
 - You can now evaluate it, by ensuring your cursor is at that line, and by
-pressing `Ctrl + Enter`. This will highlight all matching elements (in this
-case, the `Tags` header cell).
+  pressing `Ctrl + Enter`. This will highlight all matching elements (in this
+  case, the `Tags` header cell).
 
 **Note:** Alternative ways to get the same cell using filters: use the selector
 gadget to select all header cells (you just need to click one, the others will
@@ -271,6 +216,23 @@ itemCheckbox.click(); // this will toggle the checkbox
 ```
 
 ## JQuery methods
+
+Minium API is intentionaly very similar to [JQuery](https://api.jquery.com/) so
+that it's very easy for developers that are familiar with JQuery to start
+working with Minium. Besides, CSS selectors also support JQuery extensions.
+
+Some examples of JQuery valid expressions that also work in Minium:
+
+```javascript
+// gets the button element with index 4 (note that it's 0-based)
+$("button").eq(4);
+
+// gets table rows for all table header cells in the page
+$("th").parents("tr");
+
+// retuns all unchecked checkboxes
+$(":checkbox").not(":checked");
+```
 
 ## Base Expression pattern
 
@@ -481,25 +443,112 @@ composeBtn.click();
 ```
 
 **Note:** There is a special waiting preset, `immediate`, that doesn't wait at
-all:
+all. Besides, you can use `.checkForUnexistence()` / `.checkForExistence()` to
+determine if any matching element exists or not without failing:
 
 ```javascript
-loading.waitForUnexistence("immediate");
+loading.checkForUnexistence("immediate") // returns true or false immediately
 ```
 
 ## Interaction Listeners
 
+Having to explicitly wait every time a spinning wheel is displayed only adds
+complexity to the code. Besides, when we explain someone how to use some
+functionality in a site, we never tell them they need to wait until the spinning
+wheel disappears, because it is already assumed. The same way, we want minium
+to implicitly wait every time it sees a spinning wheel.
+
+Interaction listeners are specially handy for these kind of situations, and also
+for error handling, like retrying some interaction when it fails. They intercept
+all interaction calls, and can perform additional logic before, after or when
+they fail.
 
 ### ensureExistence / ensureUnexistence
 
-```javascript
-var timeUnits = require("minium/timeunits");
+These interaction listeners only allow the interaction to be performed after
+existence / unexistence or certain elements. In our case, we want to ensure that
+no spinning wheel is displayed in the page:
 
+```javascript
 var loading = $(".loading").withCss("display", "block");
 
 var loadingUnexistenceListener = minium.interactionListeners
-  .ensureUnexistence(loading);
+  .ensureUnexistence(loading)
+  .withWaitingPreset("slow");
 
+// browser configuration
+browser.configure()
+  .interactionListeners()
+    .add(loadingUnexistenceListener)
+  .done();
+```
+
+We can now run the same code that removes and email and then starts composing
+a new mail without having to call `loading.waitForUnexistence()`:
+
+```javascript
+browser.get("http://minium.vilt.io/sample-app/");
+
+var mailItemCheckbox = $(":checkbox");
+var removeBtn = $("#remove-action");
+var composeBtn = $("#compose");
+
+mailItemCheckbox.click();
+removeBtn.click();
+composeBtn.click();
+```
+
+### Error handling
+
+There are situations where some exception can be thrown. For instance, if during
+some interaction an `alert` window is displayed, an `UnhandledAlertException` is
+thrown. Of course, we can explicitly handle `alert` windows with
+`$(":root").alert().accept()`, for instance, but if we cannot predict when the
+alert window will be displayed, we may need to handle it once it occurs:
+
+```javascript
+// always accepts window alerts
+var unhandledAlertListener = minium.interactionListeners
+  .onUnhandledAlert()
+  .accept();
+
+// browser configuration
+browser.configure()
+  .interactionListeners()
+    .add(unhandledAlertListener)
+  .done();
+```
+
+Another kind of errors that can happen is the `StaleElementReferenceException`,
+which basically happens when we try to interact with an element that no longer
+exists in the page (for instance, if the page was refreshed, which forces that
+element to be destroyed in the browser).
+
+In case you start getting these kind of errors, you can register the following
+interaction listener:
+
+```javascript
+// always accepts window alerts
+var staleElementReferenceListener = minium.interactionListeners
+  .onStaleElementReference()
+  .thenRetry();
+
+// browser configuration
+browser.configure()
+  .interactionListeners()
+    .add(staleElementReferenceListener)
+  .done();
+```
+
+### Timeout handling
+
+It is also possible to handle timeout exceptions in a very advanced way. The
+following example shows an interaction listener that, when a timeout occurs,
+is triggered, and then checks if an loading element exists in the page. If it
+exists, it will wait for its unexistence with a provided waiting preset and
+then it will retry the interaction:
+
+```javascript
 var timeoutListener = minium.interactionListeners
   .onTimeout()
   .when(loading)
@@ -507,18 +556,81 @@ var timeoutListener = minium.interactionListeners
   .withWaitingPreset("slow")
   .thenRetry();
 
-// browser configuration
 browser.configure()
-  .waitingPreset("fast")
-    .timeout(1, timeUnits.SECONDS)
-  .done()
-  .waitingPreset("slow")
-    .timeout(10, timeUnits.SECONDS)
-  .done()
   .interactionListeners()
-    .add(loadingUnexistenceListener)
-    .add(timeoutListener)
-  .done();
+    .add(timeoutListener);
 ```
 
 # Files and Modules
+
+
+## Configuration values
+
+In `config/application.yml` under your project, you can find all your Minium
+configuration (for instance, which default browser to use, browser window
+dimensions, etc.).
+
+There is, however, a special configuration block under `minium.config`: that
+is configuration you can add and use in your application. In your javascript
+code, you can access all its properties under the variable `config`.
+
+**Exercise:**
+
+Edit the `application.yml` and change it to have a property `name` with value
+`World`:
+
+```yaml
+minium:
+  webdriver:
+   ...
+  config:
+    name: World
+```
+
+That `name` property is now under the variable `config`, so you can evaluate the
+following code:
+
+```javascript
+"Hello " + config.name // it evaluate into "Hello World"
+```
+
+If you change the name to `Minium`, for instance:
+
+```yaml
+minium:
+  webdriver:
+   ...
+  config:
+    name: Minium
+```
+
+then re-evaluating `"Hello " + config.name` will return `Hello
+Minium`.
+
+You can even add complex configuration there:
+
+```yaml
+minium:
+  webdriver:
+   ...
+  config:
+    users:
+      administrator:
+        username: admin
+        password: strong_password
+    fruits:
+      - banana
+      - orange
+      - strawberry
+```
+
+and then access it:
+
+```javascript
+console.log(config.users['administrator'].username); // prints "admin"
+
+config.fruits.forEach(function (fruit) { console.log(fruit) }) // prints:
+// banana
+// orange
+// strawberry
+```
