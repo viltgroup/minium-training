@@ -84,7 +84,90 @@ After that, if you try to run the previous code, it will fail:
 "Hello " + name // ReferenceError: "name" is not defined
 ```
 
-# WebElements and Interactions
+# WebElements
+
+`WebElements` and its parent class `Elements` are the most important concept in
+Minium. They represent an instruction (from now on, we'll call them Minium
+expressions) that will eventually evaluate into elements that we want to
+interact with.
+
+`WebElements` are normally lazy (there are some exceptions), and they can be
+evaluated several times with different results, which means that the same Minium
+expression can be reused. Besides, its chainable method API always returns
+a new Minium expression, so Minium expressions are by nature immutable.
+
+Consider the following Minium expression:
+
+```javascript
+sentNavItem = $("#folders-nav").find("a").eq(2);
+```
+
+That expression itself does not communicate with the browser, because it was
+not evaluated yet. For an expression to be evaluated, one of the following
+invocations need to occur:
+
+- A method with a return value other than a subclass of `Elements` (parent class
+  of `WebElements`) is invoked, like:
+
+```javascript
+sentNavItem.text();
+```
+
+- An interaction method is called:
+
+```javascript
+sentNavItem.click();
+```
+
+# Interactions
+
+Interactions are another key concept in Minium. They represent user interactions
+with the browser, like clicking, filling input fields, or even waiting that some
+element exists. Objects that can perform interactions are known as
+`Interactable`. Typically, all `Elements` / `WebElements` are interactable. The
+`Interactable` interface provides interactions behind methods like `.click()` or
+`.fill()`.
+
+The most important `Interactable` interfaces are:
+
+- `MouseInteractable`: allows mouse operations with elements, like clicking,
+  moving mouse around, etc.
+- `KeyboardInteractable`: allows keyboard operations with elements, like
+  pressing a key, typing text, etc.
+- `WaitInteractable`: wait conditions on elements
+
+Interactions have a very important behaviour: **they try the best they can to
+fulfill their task**. For instance, let's say we have the following expression:
+
+```javascrippt
+field = $(":text").unless(".loading");
+```
+
+This expression represents all text input elements in the page **unless** there
+is some element with `loading` CSS class (in that case, it will then evaluate
+to an empty set).
+
+Now let's try to interact with it:
+
+```javascript
+field.fill("Minium can!");
+```
+
+At this point, we have an interaction being called, and for that reason Minium
+will evaluate `field`. If there is some `.loading` element in the page (for
+instance, some AJAX is being performed and the page displays a loading element
+to let us know that), then `field` will evaluate to an empty set, and for that
+reason, it cannot be filled with text. At this point, Minium will wait a
+specified `interval` period and then retry the evaluation. Two situations
+may occur:
+
+- Eventually, the expression evaluates to a non-empty set. Minium will then grab
+  the first element of that evaluated set and will fill it with the specified
+  text.
+- the expression keeps evaluating to an empty set, and the total period
+  surpasses a specified `timeout` period. At this point, interaction is aborted
+  and a `TimeoutException` is thrown.
+
 
 # Developing Minium with Minium Developer
 
@@ -560,6 +643,29 @@ browser.configure()
   .interactionListeners()
     .add(timeoutListener);
 ```
+
+# Assertions
+
+Minium includes [Expect library](https://github.com/Automattic/expect.js) for
+assertions, and extends it to add Minium-specific methods.
+
+For instance, to assert the existence of an element:
+
+```javascript
+var composeBtn = $("compose");
+
+expect(compose).to.exist();
+```
+
+Or, if you want to check that some element has a specific text:
+
+```javascript
+var composeBtn = $("compose");
+
+expect(compose).to.have.text("Compose");
+```
+
+You can find more documentation on [Assertions API](http://minium.vilt.io/docs/core/api/assertions/).
 
 # Files and Modules
 
