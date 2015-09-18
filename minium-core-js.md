@@ -1,6 +1,6 @@
-# Minium Training
+# Minium Core and Minium Developer (javacript editor)
 
-In this training, we'll take a look into Minium using its API, and we'll use
+In this training, we'll take a look into Minium Core, and we'll use
 Minium Developer to write some Minium javascript code. We'll learn its concepts,
 namely `WebElements` and `Interactions`, as well as interaction listeners.
 We'll also make use of some tools provided by Minium Developer to helps us write

@@ -14,6 +14,78 @@ If you just want to jump straight to the finished test project you can check the
 complete source code in
 [https://github.com/viltgroup/minium-mail-e2e-tests](https://github.com/viltgroup/minium-mail-e2e-tests)
 
+
+## Configuration values
+
+In `config/application.yml` under your project, you can find all your Minium
+configuration (for instance, which default browser to use, browser window
+dimensions, etc.).
+
+There is, however, a special configuration block under `minium.config`: that
+is configuration you can add and use in your application. In your javascript
+code, you can access all its properties under the variable `config`.
+
+**Exercise:**
+
+Edit the `application.yml` and change it to have a property `name` with value
+`World`:
+
+```yaml
+minium:
+  webdriver:
+   ...
+  config:
+    name: World
+```
+
+That `name` property is now under the variable `config`, so you can evaluate the
+following code:
+
+```javascript
+"Hello " + config.name // it evaluate into "Hello World"
+```
+
+If you change the name to `Minium`, for instance:
+
+```yaml
+minium:
+  webdriver:
+   ...
+  config:
+    name: Minium
+```
+
+then re-evaluating `"Hello " + config.name` will return `Hello
+Minium`.
+
+You can even add complex configuration there:
+
+```yaml
+minium:
+  webdriver:
+   ...
+  config:
+    users:
+      administrator:
+        username: admin
+        password: strong_password
+    fruits:
+      - banana
+      - orange
+      - strawberry
+```
+
+and then access it:
+
+```javascript
+console.log(config.users['administrator'].username); // prints "admin"
+
+config.fruits.forEach(function (fruit) { console.log(fruit) }) // prints:
+// banana
+// orange
+// strawberry
+```
+
 ### Writing the first Scenario
 
 As you already know a **scenario** is part of a **feature** file and the
@@ -368,14 +440,14 @@ git checkout v3
 
 ### Background
 
-Sometimes you will find yourself repeating the same `Given` steps in all of the scenarios in a feature. 
+Sometimes you will find yourself repeating the same `Given` steps in all of the scenarios in a feature.
 
 You can move and group those steps under a Background section before the fisrt scenario. The background runs before each one of your scenarios.
 
 ```gherkin
 Feature: Delete Emails
 
-  Background: 
+  Background:
     Given I'm at Minium Mail
 
   Scenario: Delete an email
@@ -443,14 +515,11 @@ Scenario Outline: Send simple emails
     | Subject    | <subject> |
     | Message    | <message> |
 
-  Examples: 
+  Examples:
     | to             | subject      | message                                        |
     | Rui Figueira   | Minium Test  | My New messages                                |
     | Mario Lameiras | BDD + Minium | Egestas morbi at. Curabitur aliquet et commodo |
 ```
-
-
-
 
 ---
 
