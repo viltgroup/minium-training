@@ -191,6 +191,41 @@ git checkout v1
 
 ## Autocomplete
 
+If you want to have some help writting your steps, you can add in your application.yml (config/application.yml) of your cucumber project the step's that you are writing. This way you will have some autocompletion features for those step's.
+
+```yaml
+minium:
+  webdriver:
+    desiredCapabilities:
+      browserName: chrome
+    window:
+      maximized: true
+  cucumber:
+    snippets:
+      - name: "Given I'm logged in as ..."
+      - name: "When I navigate to \"...\""
+      - name: "When I fill the form with:"
+        rowsHashKeys:
+          - Name
+          - Address
+      - name: "Then I should see error message \"...\""
+      - name: "Given I'm at Minium Mail"
+      - name: "Given an email with \"...\" exists"
+      - name: "Given an email with \"...\" exists under \"...\""
+      - name: "Given an email with \"...\" doesn't exist"
+      - name: "Given an email with \"...\" doesn't exist under \"...\""
+      - name: "Given I'm at section \"...\""
+      - name: "When I click on button \"...\""
+      - name: "When I fill \"...\" with \"...\""
+      - name: "When I fill:"
+      - name: "When I click on the email with:"
+      - name: "When I delete an email with Subject \"...\""
+      - name: "When I move an email with Subject \"...\" to \"...\""
+      - name: "When I navigate to section \"...\""
+      - name: "Then I should see an email with:"
+      - name: "Then I shouldn't see an email with:"
+```
+
 ## Refactoring
 
 We can refactor our feature file using tables Tables are useful for specifying
