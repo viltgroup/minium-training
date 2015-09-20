@@ -218,67 +218,6 @@ Then(/^I should see an email with "(.*?)" equals to "(.*?)"$/, function(field, v
 Add it to `steps/mail-steps.js` and run the scenario once again. It should now
 complete successfully.
 
-## Deal with loadings, animations and overlays
-
-### Loadings and Animations
-
-When we create a new email, the application has a loading time while the new
-email is being created. To perform other actions in the page we need to wait
-until the loading disappears.
-
-```javascript
-var loading = $(".loading").withCss("display", "block");
-
-// This base expression always returns the scope we're working on: the main
-// window unless a modal is visible and a loading is visible
-var base = $(":root").unless(loading);
-```
-
-For example, many web applications contain asynchronous callbacks. When an
-asynchronous callback is made, the page waits for a response from the server
-and most of the times waiting icon appears on the page. Before realizing another
-action we need to wait for the asynchronous callback to complete, otherwise
-the next action can fail. So we need to have a waiting mechanism for this type
-of case.
-
-This can be very useful not only when you got **loading animation** on
-asynchronous callbacks, but also for other any other animation or overlays.
-
-### Overlays
-
-When a modal appear usually we can only interact with the modal elements.
-
-```javascript
-var loading = $(".loading").withCss("display", "block");
-```
-
-You can check this first first doing:
-
-```bash
-git clone https://github.com/viltgroup/minium-mail-e2e-tests.git
-cd minium-mail-e2e-tests
-git checkout v1
-```
-
-## Autocomplete
-
-If you want to have some help writing your steps, you can add in your
-`config/application.yml` of your cucumber project the step's that you are
-writing. This way you will have auto-completion features for those step's.
-
-```yaml
-minium:
-  webdriver:
-   ...
-  cucumber:
-    snippets:
-      - name: "Given I'm at Minium Mail"
-      - name: "When I click on button \"...\""
-      - name: "When I fill \"...\" with \"...\""
-      - name: "When I navigate to section \"...\""
-      - name: "Then I should see an email with \"...\" equals to \"...\""
-```
-
 ## Refactoring
 
 ### Configuration values
@@ -400,9 +339,10 @@ When(/^I fill:$/, function(datatable) {
 });
 ```
 
-### Cucumber world
+### Interaction listeners and Base expressions
 
-Global browser configuration like interaction listeners and
+Global browser configuration like
+[interaction listeners](minium-core-js.md#interaction-listeners) and
 [base expressions](minium-core-js.md#base-expression-pattern)
 can also be used in Minium Cucumber projects. For that, we recommend that the
 corresponding code goes into a `steps/world.js` file that makes use of a
@@ -454,9 +394,9 @@ World(function () {
 });
 ```
 
-Now, you can replace all `$(...)` calls with `base.find(...)`, and also remove
-any `waitForUnexistence` you have related with the spinning wheel and modal
-backdrop.
+Now, you can replace all `$(...)` calls with `base.find(...)` in any of your
+javascript files, and also remove any `waitForUnexistence` you have related with
+the spinning wheel and modal backdrop.
 
 ### Modules
 
@@ -604,6 +544,25 @@ Scenario Outline: Send simple emails
     | to             | subject      | message                                        |
     | Rui Figueira   | Minium Test  | My New messages                                |
     | Mario Lameiras | BDD + Minium | Egestas morbi at. Curabitur aliquet et commodo |
+```
+
+## Autocomplete
+
+If you want to have some help writing your steps, you can add in your
+`config/application.yml` of your cucumber project the step's that you are
+writing. This way you will have auto-completion features for those step's.
+
+```yaml
+minium:
+  webdriver:
+   ...
+  cucumber:
+    snippets:
+      - name: "Given I'm at Minium Mail"
+      - name: "When I click on button \"...\""
+      - name: "When I fill \"...\" with \"...\""
+      - name: "When I navigate to section \"...\""
+      - name: "Then I should see an email with \"...\" equals to \"...\""
 ```
 
 ---
