@@ -147,12 +147,11 @@ Interactions have a very important behaviour: **they try the best they can to
 fulfill their task**. For instance, let's say we have the following expression:
 
 ```javascrippt
-field = $(":text").unless(".loading");
+field = $("input").withLabel("Subject");
 ```
 
-This expression represents all text input elements in the page **unless** there
-is some element with `loading` CSS class (in that case, it will then evaluate
-to an empty set).
+This expression represents input elements with a label `Subject` (which matches
+the subject field in the compose form).
 
 Now let's try to interact with it:
 
@@ -161,11 +160,10 @@ field.fill("Minium can!");
 ```
 
 At this point, we have an interaction being called, and for that reason Minium
-will evaluate `field`. If there is some `.loading` element in the page (for
-instance, some AJAX is being performed and the page displays a loading element
-to let us know that), then `field` will evaluate to an empty set, and for that
-reason, it cannot be filled with text. At this point, Minium will wait a
-specified `interval` period and then retry the evaluation. Two situations
+will evaluate `field`. If `Compose` button was not pressed yet, and therefore
+the compose email form is not shown, then `field` will evaluate to an empty set,
+and for that reason, it cannot be filled with text. At this point, Minium will
+wait a specified `interval` period and then retry the evaluation. Two situations
 may occur:
 
 - Eventually, the expression evaluates to a non-empty set. Minium will then grab
@@ -174,6 +172,12 @@ may occur:
 - the expression keeps evaluating to an empty set, and the total period
   surpasses a specified `timeout` period. At this point, interaction is aborted
   and a `TimeoutException` is thrown.
+
+For that expression to succeed, try to:
+
+- Evaluate `field.fill("Minium can!")`
+- Manually click `Compose` button before timeout occurs, which is 5 seconds
+- Once the form opens, you'll see the `Subject` field will be filled properly.
 
 ## Selector Gadget
 
