@@ -63,7 +63,7 @@ For that, we will need to:
 Let's convert those actions into a scenario. For that, just replace all the
 content of `feature/send-mail.feature` with the following:
 
-```gherkin_en
+```gherkin
 Feature: Send emails
 
   Scenario: Send a simple Email
@@ -184,7 +184,8 @@ button was pressed because the same step definition responsible for clicking the
 
 Implement the `And I navigate to section "Sent"` step. You'll need to consider
 the fact that, after pressing the `Send` button, the modal backdrop will still
-be there and so you will need to wait for it to fade out and disappear.
+be there and so you will need to wait for it to fade out and disappear. You'll
+get extra points if you use the base expression pattern.
 
 ## Assertions
 
@@ -285,8 +286,8 @@ a larger data set and are more readable.
 ```gherkin
 Scenario: Send an Email
 
-  Given I'm at sample app
-  When I click on button "New"
+  Given I'm at Minium Mail
+  When I click on button "Compose"
   And I fill:
     | Recipients | Rui Figueira   |
     | Subject    | Minium Test    |

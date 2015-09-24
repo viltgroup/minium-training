@@ -302,7 +302,7 @@ var recipientCell = recipientsCells.withText("Minium Bot")
 Now it's easy to click the checkbox of that row:
 
 ```javascript
-var itemCheckbox = $(":checkbox").leftOf(recipientsCell);
+var itemCheckbox = $(":checkbox").leftOf(recipientCell);
 itemCheckbox.click(); // this will toggle the checkbox
 ```
 
