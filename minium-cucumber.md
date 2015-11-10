@@ -566,6 +566,72 @@ minium:
       - name: "Then I should see an email with \"...\" equals to \"...\""
 ```
 
+## Load external data
+
+Sometimes, the application that you want to test can have dynamic data and the data of the tests also need to be dynamic.
+In order to be able to have dynamic data in your tests, Minium allows you to parametrize the table row values and replace them with external data loaded from an Excel or a CSV.
+
+1- Describe your scenario as Gherkin in a normal feature file.
+```gherkin
+Scenario: Send an Email
+   When I click on button "Compose"
+   And I fill:
+     | Recipients | Rui Figueira   |
+     | Subject    | Minium Test    |
+     | Message    | My new Message |
+```
+2 - Tag the data table section with `#@source:<your-file-with-the-data>`
+
+Your `Scenario` will like:
+```gherkin
+Scenario: Send an Email
+   When I click on button "Compose"
+   And I fill:
+     # @source:data/data-table.csv
+     | Recipients | Rui Figueira   |
+     | Subject    | Minium Test    |
+     | Message    | My new Message |
+```
+
+3 - Create an Excel file or a CSV file, with the same structure.
+
+```csv
+Recipients,Minium Bot
+Subject,Minium Test with Loaded Data
+Message,New Messages with Loaded Data
+```
+
+### Scenario with external data loaded
+
+When the scenario will be executed, Minium will replace your data table with the data of the external source.
+For this example your `scenario` will become:
+
+```gherkin
+Scenario: Send an Email
+   When I click on button "Compose"
+   And I fill:
+     # @source:data/data-table.csv
+     | Recipients | Minium Bot                      |
+     | Subject    | Minium Test with Loaded Data    |
+     | Message    | New Messages with Loaded Data   |
+```
+
+
+### TIPS
+
+- Create a folder `data` in your project and put theres your external resources.
+
+- Try not to load files with hardcoded paths from your machine. Because this way it will work only in your machine.
+
+- Make sure that the format of the external file where the data will be loaded
+is the same of the feature.
+
+
+### Supported formats
+- .csv
+- .xls
+- .xlsx
+
 ---
 
 You can check the complete source code in [https://github.com/viltgroup/minium-mail-e2e-tests](https://github.com/viltgroup/minium-mail-e2e-tests)
