@@ -276,13 +276,27 @@ If you have Minium Developer Prime, you will have access to a Minium Recorder.
 
 Minium Recorder records your interactions with the browser.
 
+To start recording, click on the following button:
+
+![minium-recorder-start](images/start-recording.png)
+
+From now on, every interaction that you perform with the browser will be registered.
+
 ![Minium Recorder example](images/instructions.png)
+
+If you are not satisfied with an expression, click on the expression and a list of alternative expressions will be displayed:
+
+![minium-recorder-alternative-expressions](images/alternative-expressions.png)
+
+To select an expression, just click on it.
 
 Once you're done, click "Import recorded script" and the script will be immediately available in Minium Developer.
 
+![Import script](images/import-script.png)
+
 ![Automated script](images/script-copied.png)
 
-http://minium.vilt.io/docs/recorder/user-manual/
+[User Manual](http://minium.vilt.io/docs/recorder/user-manual/)
 
 
 
