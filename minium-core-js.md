@@ -268,6 +268,24 @@ For instance, to click the `Compose` button:
 $("#compose").click();
 ```
 
+## Minium Recorder
+
+If you have Minium Developer Prime, you will have access to a Minium Recorder.
+
+![Minium Recorder available](images/browser-open.png)
+
+Minium Recorder records your interactions with the browser.
+
+![Minium Recorder example](images/instructions.png)
+
+Once you're done, click "Import recorded script" and the script will be immediately available in Minium Developer.
+
+![Automated script](images/script-copied.png)
+
+http://minium.vilt.io/docs/recorder/user-manual/
+
+
+
 ## Select cells in tables
 
 Selecting cells in tables based on their values and columns can be hard. Minium

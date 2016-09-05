@@ -569,7 +569,7 @@ minium:
 ## Load external data
 
 Sometimes, the application that you want to test can have dynamic data and the data of the tests also need to be dynamic.
-In order to be able to have dynamic data in your tests, Minium allows you to parametrize the table row values and replace them with external data loaded from an Excel or a CSV.
+In order to be able to have dynamic data in your tests, Minium allows you to parameterize the table row values and replace them with external data loaded from an Excel or a CSV.
 
 1- Describe your scenario as Gherkin in a normal feature file.
 ```gherkin
@@ -617,21 +617,22 @@ Scenario: Send an Email
 ```
 
 
-### TIPS
+### Best practices
 
-- Create a folder `data` in your project and put theres your external resources.
+- Create a folder `data` in your project and put there your files with the external data.
 
-- Try not to load files with hardcoded paths from your machine. Because this way it will work only in your machine.
+- Try not to load files with hardcoded paths from your machine. Because this way it will work only in your machine. Use a file relative to your Minium project like "data/data-table.csv" and not a path like "C:/Users/joe/minium/ata-table.csv".
 
 - Make sure that the format of the external file where the data will be loaded
 is the same of the feature.
 
 
-### Supported formats
-- .csv
-- .xls
-- .xlsx
+You can view some examples of this feature in  [https://github.com/viltgroup/minium-mail-e2e-tests/tree/master/src/test/resources/features](https://github.com/viltgroup/minium-mail-e2e-tests/tree/master/src/test/resources/features)
 
+
+### Supported formats
+- CSV
+- Excel
 ---
 
 You can check the complete source code in [https://github.com/viltgroup/minium-mail-e2e-tests](https://github.com/viltgroup/minium-mail-e2e-tests)
