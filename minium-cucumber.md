@@ -748,6 +748,10 @@ function html5Upload(fld, value) {
 }
 ```
 
+**Exercise:**
+
+Change our tests to always use HTML5 file upload instead by changing Minium Mail configuration, and use the provided function to properly fill the email form. 
+
 ---
 
 You can check the complete source code in [https://github.com/viltgroup/minium-mail-e2e-tests](https://github.com/viltgroup/minium-mail-e2e-tests)
