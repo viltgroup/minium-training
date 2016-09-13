@@ -566,12 +566,12 @@ minium:
       - name: "Then I should see an email with \"...\" equals to \"...\""
 ```
 
-## Load external data
+## External data in Gherkin files
 
-Sometimes, the application that you want to test can have dynamic data and the data of the tests also need to be dynamic.
-In order to be able to have dynamic data in your tests, Minium allows you to parameterize the table row values and replace them with external data loaded from an Excel or a CSV.
+Sometimes, the application that you want to test can be stored in a more convenient file format, like `Excel` or `CSV`.
+Minium allows you to parameterize the table row values and replace them with external data loaded from those files:
 
-1- Describe your scenario as Gherkin in a normal feature file.
+* Describe your scenario as Gherkin in a normal feature file:
 ```gherkin
 Scenario: Send an Email
    When I click on button "Compose"
@@ -580,9 +580,9 @@ Scenario: Send an Email
      | Subject    | Minium Test    |
      | Message    | My new Message |
 ```
-2 - Tag the data table section with `#@source:<your-file-with-the-data>`
+* Tag the data table section with `# @source:<your-file-with-the-data>`:
 
-Your `Scenario` will like:
+Your `Scenario` will look like:
 ```gherkin
 Scenario: Send an Email
    When I click on button "Compose"
@@ -593,7 +593,7 @@ Scenario: Send an Email
      | Message    | My new Message |
 ```
 
-3 - Create an Excel file or a CSV file, with the same structure.
+* Create an `Excel` or `CSV` file, with the same structure:
 
 ```csv
 Recipients,Minium Bot
@@ -601,10 +601,8 @@ Subject,Minium Test with Loaded Data
 Message,New Messages with Loaded Data
 ```
 
-### Scenario with external data loaded
-
-When the scenario will be executed, Minium will replace your data table with the data of the external source.
-For this example your `scenario` will become:
+When that scenario is executed, Minium will replace your data table with the data of the corresponding external source.
+In this example, your scenario will become:
 
 ```gherkin
 Scenario: Send an Email
@@ -616,23 +614,140 @@ Scenario: Send an Email
      | Message    | New Messages with Loaded Data   |
 ```
 
-
 ### Best practices
 
-- Create a folder `data` in your project and put there your files with the external data.
+* Create a folder `data` in your project and put there your files with the external data.
 
-- Try not to load files with hardcoded paths from your machine. Because this way it will work only in your machine. Use a file relative to your Minium project like "data/data-table.csv" and not a path like "C:/Users/joe/minium/ata-table.csv".
+* Try not to load files with hardcoded paths from your machine. Because this way it will work only in your machine. Use a file relative to your Minium project like "data/data-table.csv" and not a path like `C:/Users/joe/minium/data-table.csv`.
 
-- Make sure that the format of the external file where the data will be loaded
-is the same of the feature.
+* Make sure that the format of the external file where the data will be loaded is the same of the feature.
 
+You can view some examples of this feature in [send-email-loading-external-data.feature](https://github.com/viltgroup/minium-mail-e2e-tests/tree/master/src/test/resources/features).
 
-You can view some examples of this feature in  [https://github.com/viltgroup/minium-mail-e2e-tests/tree/master/src/test/resources/features](https://github.com/viltgroup/minium-mail-e2e-tests/tree/master/src/test/resources/features)
+## Advanced Interactions: Submit files
 
+While mouse and keyboard interactions are easy to understand and to automate, file uploading is more complicated, because it requires access to native operations like selecting a file from the browser file system. In cases where the browser is running in a different remote machine it is even harder, because we would need to ensure that the file we want to upload exists there.
 
-### Supported formats
-- CSV
-- Excel
+Because this is a very recurring problem, Selenium already has good support for file uploading. When you try to upload a file, Selenium first sends that file to the machine where the browser is running and it can then upload it normally.
+
+We'll look into two different cases of file uploading.
+
+### Normal file submit
+
+The first and simplest case is when we have a file input field.
+Minium Mail has a `Attachment` field which, by default, is a file input field, and we're going to fill it properly.
+
+* Edit your `Send an Email` scenario, and add an `Attachment` field to it. It will look like:
+```gherkin
+Scenario: Send an Email
+   When I click on button "Compose"
+   And I fill:
+     | Recipients | Rui Figueira    |
+     | Subject    | Minium Test     |
+     | Message    | My new Message  |
+     | Attachment | minium_logo.png |
+   And I click on button "Send"
+   And I navigate to section "Sent"
+   Then I should see an email with:
+     | Recipients | Rui Figueira    |
+     | Subject    | Minium Test     |
+     | Message    | My new Message  |
+     | Attachment | minium_logo.png |
+```
+
+* Edit your `config/application.yml` file and add a new configuration to indicate a directory where to look for files to upload:
+
+```yaml
+minium:
+  ...
+  config:
+    baseUrl: "http://minium.vilt.io/sample-app/"
+    uploadDir: ${minium.resources.dir}/upload
+    ...
+```
+
+NOTE: Property `minium.resources.dir` will evaluate into your test project `resources` directory. You can check the proper `uploadDir` value by evaluating `config.uploadDir`.
+
+* Create a `upload` directory in your project and copy [minium_logo.png](https://github.com/viltgroup/minium-mail-e2e-tests/raw/master/src/test/resources/upload/minium_logo.png) there.
+
+* Edit your file `modules/forms.js` and change it to support file upload:
+
+```javascript
+var File = Packages.java.io.File;
+
+var forms = {
+
+  fill : function (vals) {
+    for (var fldName in vals) {
+      var value = vals[fldName];
+
+      var fld = base.find("input, textarea, select").withLabel(fldName);
+
+      if (fld.waitForExistence().is("select")) {
+        fld.select(value);
+      } else if (fld.waitForExistence().is(":file")) {
+        // let's get the absolute full path for our file
+        var file = new File(config.uploadDir, value);
+        // we now pass that path to the file input
+        fld.type(file.getAbsolutePath());
+      } else {
+        fld.fill(value);
+      }
+    }
+  }
+  ...
+```
+
+### HTML5 File drag and drop
+
+HTML5 supports file drag and drop, which is an alternative way of uploading files instead of using a input file.
+Selenium, however, does not support this option, and so, for us to be able to automate this kind of interaction, we need to trigger the `drop` event ourselves, using javascript.
+Another problem is that, for the event to have a file associated, we need to under the hood fill a normal file input field so that we can then get the file structure we need to build our event.  
+
+Minium Mail has a configuration option to use HTML5 drag and drop to upload attachments for mails instead of a file input field:
+
+![html5-file-upload-configuration](images/html5-file-upload-configuration.png "HTML5 file upload configuration")
+
+When checked, instead of a file input field, attachment will convert into a drop area:
+
+![compose-html5-file-upload](images/compose-html5-file-upload.png "Composing mail with HTML5 file upload")
+
+The following function can be used to simulate a file drop into an element:
+
+```javascript
+function html5Upload(fld, value) {
+
+  // if no #minium-upload input file exists, we create one
+  $(":root").apply(function () {
+    if ($("#minium-upload").length === 0) {
+      $("<input/>").attr({ id: 'minium-upload', type:'file' }).css("opacity", "0").appendTo("body");
+    }
+  });
+
+  var uploadFld = $("#minium-upload");
+
+  // we set its vaiue for the proper file
+  uploadFld.type(new File(config.uploadDir, value).getAbsolutePath());
+
+  fld.apply(function () {
+    // we get the files structure from the input file...
+    var files = $("#minium-upload").get(0).files;
+    var fld = $(this).get(0);
+
+    // and use it to create a drop event and dispatch it to the drop element
+    var ev = document.createEvent("HTMLEvents");
+    ev.initEvent("drop", true, true);
+    ev.preventDefault = function () {};
+    ev.type = "drop";
+    ev.dataTransfer =  {
+      files : files
+    };
+
+    fld.dispatchEvent(ev);
+  });
+}
+```
+
 ---
 
 You can check the complete source code in [https://github.com/viltgroup/minium-mail-e2e-tests](https://github.com/viltgroup/minium-mail-e2e-tests)
